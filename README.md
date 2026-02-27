@@ -26,4 +26,4 @@ Synchronize video playback with friends.
    - Click the extension icon / open Side Panel.
    - Enter a Room ID.
    - Share Room ID with friends.
-# capstone-2026-hurdley-streamsync
+
