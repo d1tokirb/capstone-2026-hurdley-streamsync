@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamSync</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDKs -->
+    <script src="lib/firebase-app.js"></script>
+    <script src="lib/firebase-auth.js"></script>
+    <script src="lib/firebase-firestore.js"></script>
+
+    <!-- Config and App Logic -->
+    <script src="firebase-config.js"></script>
+    <script src="auth.js" defer></script>
+    <script src="socket.io.js"></script>
+    <script src="sidepanel.js" defer></script>
+</head>
+
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1 class="gradient-text">StreamSync</h1>
+            <div id="connection-status" class="status disconnected">Offline</div>
+        </header>
+
+        <!-- Authentication View -->
+        <div id="auth-view" class="panel">
+            <div id="login-form">
+                <p class="section-title" style="margin-bottom: 12px;">Sign In to your account</p>
+
+                <button id="google-login-btn" class="google-btn">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo"
+                        class="provider-icon">
+                    Sign in with Google
+                </button>
+
+                <div class="divider">
+                    <span>or continue with email</span>
+                </div>
+
+                <input type="email" id="auth-email" placeholder="Email address">
+                <input type="password" id="auth-password" placeholder="Password">
+                <button id="auth-login-btn">Log In</button>
+                <p class="auth-toggle">New here? <a href="#" id="show-signup">Create an account</a></p>
+            </div>
+
+            <div id="signup-form" class="hidden">
+                <p class="section-title" style="margin-bottom: 12px;">Create an Account</p>
+
+                <button id="google-signup-btn" class="google-btn">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo"
+                        class="provider-icon">
+                    Sign up with Google
+                </button>
+
+                <div class="divider">
+                    <span>or continue with email</span>
+                </div>
+
+                <input type="text" id="auth-display-name" placeholder="Choose a Username">
+                <input type="email" id="auth-signup-email" placeholder="Email address">
+                <input type="password" id="auth-signup-password" placeholder="Password">
+                <button id="auth-signup-btn">Sign Up</button>
+                <p class="auth-toggle">Already have an account? <a href="#" id="show-login">Log In</a></p>
+            </div>
+        </div>
+
+        <!-- Verification View (Hidden unless unverified) -->
+        <div id="verification-view" class="panel hidden">
+            <div class="verification-content">
+                <h2 style="color: var(--primary); margin-top: 0;">Verify Your Email</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px;">
+                    We've sent a verification link to your email address. Please click the link to activate your
+                    account.
+                </p>
+                <button id="resend-verification-btn" class="danger" style="margin-bottom: 12px;">Resend Email</button>
+                <button id="check-verification-btn">I've Verified My Email</button>
+                <button id="switch-account-btn" class="danger"
+                    style="margin-top: 12px; font-size: 0.8rem; background: transparent; border: none;">Switch
+                    Account</button>
+            </div>
+        </div>
+
+        <!-- Main App View (Hidden until authenticated) -->
+        <div id="app-view" class="hidden">
+            <div id="room-controls" class="panel">
+                <div class="user-greeting">
+                    <div>
+                        <span>Logged in as </span><strong id="display-username">User</strong>
+                        <button id="open-settings-btn" class="icon-btn" title="Settings">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-settings">
+                                <path
+                                    d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                    </div>
+                    <button id="auth-logout-btn" class="danger small-btn">Log Out</button>
+                </div>
+                <input type="text" id="room-input" placeholder="Enter Room ID">
+                <button id="join-btn">Join Room</button>
+            </div>
+
+            <!-- Settings View (Global) -->
+            <div id="settings-view" class="panel hidden">
+                <div class="settings-header">
+                    <p class="section-title" style="margin-bottom: 0;">Global Settings</p>
+                    <button id="close-settings-btn" class="icon-btn settings-close">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-x">
+                            <path d="M18 6 6 18" />
+                            <path d="m6 6 12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="settings-body">
+                    <!-- Account Section -->
+                    <div class="settings-section">
+                        <p class="settings-subheader">Account</p>
+                        <div class="form-group">
+                            <label for="new-username-input">Display Name</label>
+                            <input type="text" id="new-username-input" placeholder="New Username">
+                            <p id="username-cooldown-text" class="cooldown-text" style="display: none;">You can change
+                                your username in X days.</p>
+                            <button id="save-username-btn">Save Username</button>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Visuals Section -->
+                    <div class="settings-section">
+                        <p class="settings-subheader">Appearance</p>
+                        <div class="setting-row">
+                            <label for="theme-select">Theme</label>
+                            <select id="theme-select" class="settings-control">
+                                <option value="light">Light</option>
+                                <option value="dark">Dark</option>
+                            </select>
+                        </div>
+                        <div class="setting-row">
+                            <label for="accent-select">Accent Color</label>
+                            <select id="accent-select" class="settings-control">
+                                <option value="rose">Rose (Default)</option>
+                                <option value="blue">Blue</option>
+                                <option value="green">Green</option>
+                                <option value="purple">Purple</option>
+                            </select>
+                        </div>
+                        <div class="setting-row">
+                            <label for="text-size-select">Chat Text Size</label>
+                            <select id="text-size-select" class="settings-control">
+                                <option value="small">Small</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="large">Large</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Notifications Section -->
+                    <div class="settings-section">
+                        <p class="settings-subheader">Notifications & Chat</p>
+                        <div class="setting-row">
+                            <label for="mute-system-toggle">Mute System Messages</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="mute-system-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <label for="audio-alerts-toggle">Audio Alerts (Ding)</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="audio-alerts-toggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <label for="dnd-toggle">Do Not Disturb</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="dnd-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="room-info" class="hidden">
+                <div class="panel">
+                    <div class="info-row">
+                        <span>Room:</span>
+                        <span id="current-room-id" class="room-id-badge"></span>
+                        <button id="open-room-settings-btn" class="icon-btn room-settings-trigger hidden"
+                            title="Room Settings">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path
+                                    d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div id="current-video-container">
+                        <p class="section-title">Now Watching</p>
+                        <a id="current-video-link" href="#" target="_blank">No video set</a>
+                    </div>
+
+                    <div id="host-controls" class="hidden">
+                        <input type="text" id="new-video-url" placeholder="Paste new YouTube URL">
+                        <button id="change-url-btn">Change Video</button>
+                    </div>
+
+                    <!-- Room Settings Panel (Host Only) -->
+                    <div id="room-settings-view" class="hidden">
+                        <div class="settings-header">
+                            <p class="settings-subheader" style="margin: 0;">Room Settings</p>
+                            <button id="close-room-settings-btn" class="icon-btn settings-close">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M18 6 6 18" />
+                                    <path d="m6 6 12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="setting-row">
+                            <label for="sync-sensitivity-slider">Sync Sensitivity</label>
+                            <div class="slider-group">
+                                <input type="range" id="sync-sensitivity-slider" min="0.5" max="3.0" step="0.1"
+                                    value="0.5">
+                                <span id="sync-sensitivity-value">0.5s</span>
+                            </div>
+                        </div>
+
+                        <div class="setting-row">
+                            <label for="strict-mode-toggle">Strict Mode (Host Only Controls)</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="strict-mode-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-row">
+                            <label for="auto-pause-toggle">Auto-pause on Buffering</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="auto-pause-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button id="leave-btn" class="danger">Leave Room</button>
+                </div>
+            </div>
+
+            <div id="chat-container" class="hidden">
+                <div id="chat-messages"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Type a message...">
+                    <button id="send-chat-btn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

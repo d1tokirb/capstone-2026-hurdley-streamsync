@@ -1,0 +1,43 @@
+{
+    "manifest_version": 3,
+    "name": "StreamSync",
+    "version": "1.0",
+    "description": "Synchronize video playback with friends.",
+    "permissions": [
+        "sidePanel",
+        "scripting",
+        "storage",
+        "activeTab",
+        "identity"
+    ],
+    "oauth2": {
+        "client_id": "760882609948-ba3osnjkfto5a75ho186refjke2o6t2k.apps.googleusercontent.com",
+        "scopes": [
+            "https://www.googleapis.com/auth/userinfo.email",
+            "https://www.googleapis.com/auth/userinfo.profile"
+        ]
+    },
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "side_panel": {
+        "default_path": "sidepanel.html"
+    },
+    "action": {
+        "default_title": "Open Side Panel"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "all_frames": true
+        }
+    ]
+}
