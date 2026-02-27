@@ -13,5 +13,5 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-# Firebase (sensitive config - uncomment if your firebase-config.js has real API keys)
-# extension/firebase-config.js
+# Firebase (sensitive config with API keys)
+extension/firebase-config.js
