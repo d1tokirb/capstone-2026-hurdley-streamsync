@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamSync - Privacy Policy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.7;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            background: white;
+            padding: 48px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        h1 {
+            color: #f43f5e;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .updated {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 32px;
+        }
+
+        h2 {
+            color: #0f172a;
+            font-size: 1.15rem;
+            margin-top: 28px;
+            margin-bottom: 8px;
+        }
+
+        p,
+        li {
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+
+        ul {
+            padding-left: 24px;
+            margin-bottom: 12px;
+        }
+
+        a {
+            color: #f43f5e;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>StreamSync Privacy Policy</h1>
+        <p class="updated">Last updated: March 2, 2026</p>
+
+        <h2>Overview</h2>
+        <p>StreamSync is a Chrome extension that synchronizes video playback between users in real-time. We are
+            committed to protecting your privacy and being transparent about how your data is used.</p>
+
+        <h2>Data We Collect</h2>
+        <p>StreamSync collects and processes the following data:</p>
+        <ul>
+            <li><strong>Email address</strong> — Used for account creation and authentication via Firebase Auth.</li>
+            <li><strong>Display name</strong> — A username you choose, shown to other users in chat.</li>
+            <li><strong>Authentication tokens</strong> — Used to verify your identity when signing in with Google.</li>
+        </ul>
+
+        <h2>Data We Do NOT Collect</h2>
+        <ul>
+            <li>We do not track your browsing history.</li>
+            <li>We do not record what videos you watch.</li>
+            <li>We do not store chat messages on our servers — messages are relayed in real-time and not persisted.</li>
+            <li>We do not sell, share, or transfer your personal data to third parties.</li>
+        </ul>
+
+        <h2>How Your Data Is Used</h2>
+        <ul>
+            <li><strong>Authentication:</strong> Your email and display name are used solely to identify you within the
+                app and to other users in a room.</li>
+            <li><strong>Settings:</strong> Your extension preferences (theme, accent color, notification settings) are
+                stored locally on your device using Chrome's storage API and are never sent to any server.</li>
+            <li><strong>Video Sync:</strong> Playback commands (play, pause, seek) are relayed through our server to
+                synchronize video between room participants. No video content is transmitted.</li>
+        </ul>
+
+        <h2>Third-Party Services</h2>
+        <p>StreamSync uses the following third-party services:</p>
+        <ul>
+            <li><strong>Firebase Authentication</strong> (Google LLC) — For user login and account management. Subject
+                to <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.</li>
+            <li><strong>Cloud Firestore</strong> (Google LLC) — For storing minimal account metadata (username change
+                timestamps).</li>
+        </ul>
+
+        <h2>Data Security</h2>
+        <p>All authentication is handled by Firebase, which uses industry-standard encryption. Communication between the
+            extension and our server uses secure WebSocket connections.</p>
+
+        <h2>Data Retention</h2>
+        <p>Your account data is retained in Firebase for as long as your account exists. Chat messages are not stored.
+            You may delete your account at any time by contacting us.</p>
+
+        <h2>Children's Privacy</h2>
+        <p>StreamSync is not directed at children under the age of 13. We do not knowingly collect personal information
+            from children.</p>
+
+        <h2>Changes to This Policy</h2>
+        <p>We may update this privacy policy from time to time. Any changes will be reflected on this page with an
+            updated revision date.</p>
+
+        <h2>Contact</h2>
+        <p>If you have any questions about this privacy policy, please open an issue on our <a
+                href="https://github.com/d1tokirb/capstone-2026-hurdley-streamsync">GitHub repository</a>.</p>
+    </div>
+</body>
+
+</html>

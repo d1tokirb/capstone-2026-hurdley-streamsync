@@ -185,50 +185,11 @@ async function ensureUserDocument(user) {
 if (openSettingsBtn && closeSettingsBtn) {
     openSettingsBtn.addEventListener('click', () => {
         settingsView.classList.remove('hidden');
-        checkUsernameCooldown();
     });
 
     closeSettingsBtn.addEventListener('click', () => {
         settingsView.classList.add('hidden');
     });
-}
-
-function getCooldownMs() {
-    return 3 * 24 * 60 * 60 * 1000; // 3 Days
-}
-
-async function checkUsernameCooldown() {
-    if (!currentUser) return;
-
-    usernameCooldownText.style.display = 'none';
-
-    try {
-        const doc = await db.collection('users').doc(currentUser.uid).get();
-        if (doc.exists) {
-            const data = doc.data();
-            const lastChange = data.lastUsernameChange || 0;
-            const now = Date.now();
-            const timeSince = now - lastChange;
-
-            if (timeSince < getCooldownMs()) {
-                const msLeft = getCooldownMs() - timeSince;
-                const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
-                usernameCooldownText.textContent = `You can change your username in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}.`;
-                usernameCooldownText.style.display = 'block';
-                saveUsernameBtn.disabled = true;
-                newUsernameInput.disabled = true;
-            } else {
-                saveUsernameBtn.disabled = false;
-                newUsernameInput.disabled = false;
-            }
-        } else {
-            // First time, doc will be created
-            saveUsernameBtn.disabled = false;
-            newUsernameInput.disabled = false;
-        }
-    } catch (e) {
-        console.error("Error fetching rules:", e);
-    }
 }
 
 if (saveUsernameBtn) {
@@ -241,15 +202,6 @@ if (saveUsernameBtn) {
 
         try {
             await ensureUserDocument(currentUser);
-
-            // Double check cooldown just in case
-            const doc = await db.collection('users').doc(currentUser.uid).get();
-            const timeSince = Date.now() - (doc.data().lastUsernameChange || 0);
-
-            if (timeSince < getCooldownMs()) {
-                if (typeof showToast === 'function') showToast('Cooldown active. Try again later.', 'error');
-                return;
-            }
 
             // Update Auth
             await currentUser.updateProfile({ displayName: newName });
@@ -271,7 +223,8 @@ if (saveUsernameBtn) {
         } catch (error) {
             if (typeof showToast === 'function') showToast(error.message, 'error');
         } finally {
-            saveUsernameBtn.textContent = 'Save Content';
+            saveUsernameBtn.disabled = false;
+            saveUsernameBtn.textContent = 'Save Username';
         }
     });
 }
