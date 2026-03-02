@@ -1,5 +1,5 @@
 // Connect to the local server
-const socket = io('capstone-2026-hurdley-streamsync-production.up.railway.app');
+const socket = io('https://capstone-2026-hurdley-streamsync-production.up.railway.app');
 
 // DOM Elements
 const statusDiv = document.getElementById('connection-status');
